@@ -13,23 +13,27 @@ using IntType = cpp_int;
 using Rational = Spigot::Rational<IntType>;
 using LFT = Spigot::LFT<IntType>;
 
-template <typename State, typename Result>
-using NextFun = Result (*)(State const &);
-template <typename State, typename Result>
-using SafeFun = bool (*)(State const &, Result const &);
-template <typename State, typename Result>
-using ProdFun = State (*)(State const &, Result const &);
-template <typename State, typename Input>
-using ConsFun = State (*)(State const &, Input const &);
+template<typename State, typename Result>
+using NextFun = Result (*)(State const&);
+template<typename State, typename Result>
+using SafeFun = bool (*)(State const&, Result const&);
+template<typename State, typename Result>
+using ProdFun = State (*)(State const&, Result const&);
+template<typename State, typename Input>
+using ConsFun = State (*)(State const&, Input const&);
 
-template <typename Input, typename State, typename Result>
+template<typename Input, typename State, typename Result>
 cppcoro::generator<Result>
-stream(NextFun<State, Result> next, SafeFun<State, Result> safe,
-       ProdFun<State, Result> prod, ConsFun<State, Input> cons,
-       State z, cppcoro::generator<Input> elems)
+stream(
+  NextFun<State, Result> next,
+  SafeFun<State, Result> safe,
+  ProdFun<State, Result> prod,
+  ConsFun<State, Input> cons,
+  State z,
+  cppcoro::generator<Input> elems)
 {
   auto xs = elems.begin();
-  Input &x = *xs;
+  Input& x = *xs;
 
   while (true)
   {
@@ -50,7 +54,8 @@ stream(NextFun<State, Result> next, SafeFun<State, Result> safe,
 
 #include <cmath>
 
-inline cppcoro::generator<IntType> positive_integers()
+inline cppcoro::generator<IntType>
+positive_integers()
 {
   IntType num = 1;
   while (true)
@@ -60,76 +65,74 @@ inline cppcoro::generator<IntType> positive_integers()
   }
 }
 
-inline cppcoro::generator<LFT> pi_leibniz_lfts()
+inline cppcoro::generator<LFT>
+pi_leibniz_lfts()
 {
   return cppcoro::fmap(
-      [](auto k) {
-        return LFT{k, 4 * k + 2, 0, 2 * k + 1};
-      },
-      positive_integers());
+    [](auto k) {
+      return LFT{k, 4 * k + 2, 0, 2 * k + 1};
+    },
+    positive_integers());
 }
 
-inline cppcoro::generator<IntType> pi_leibniz()
+inline cppcoro::generator<IntType>
+pi_leibniz()
 {
   auto init = LFT::unit();
   auto lfts = pi_leibniz_lfts();
 
-  auto next = [](LFT const &z) { return z(3).floor(); };
-  auto safe = [](LFT const &z, IntType const &n)
-  { return n == z(4).floor(); };
-  auto prod = [](LFT const &z, IntType const &n) {
+  auto next = [](LFT const& z) { return z(3).floor(); };
+  auto safe = [](LFT const& z, IntType const& n) { return n == z(4).floor(); };
+  auto prod = [](LFT const& z, IntType const& n) {
     return LFT{10, -10 * n, 0, 1}.compose(z);
   };
-  auto cons
-      = [](LFT const &z, LFT const &z2) { return z.compose(z2); };
+  auto cons = [](LFT const& z, LFT const& z2) { return z.compose(z2); };
   return stream(*next, *safe, *prod, *cons, init, std::move(lfts));
 }
 
 #include <tuple>
 
-inline cppcoro::generator<LFT> pi_lambert_lfts()
+inline cppcoro::generator<LFT>
+pi_lambert_lfts()
 {
   return cppcoro::fmap(
-      [](auto i) {
-        return LFT{2 * i - 1, i * i, 1, 0};
-      },
-      positive_integers());
+    [](auto i) {
+      return LFT{2 * i - 1, i * i, 1, 0};
+    },
+    positive_integers());
 }
 
 using LambertPair = std::pair<LFT, IntType>;
-inline cppcoro::generator<IntType> pi_lambert()
+inline cppcoro::generator<IntType>
+pi_lambert()
 {
   LambertPair init = {{0, 4, 1, 0}, 1};
   auto lfts = pi_lambert_lfts();
 
-  NextFun<LambertPair, IntType> next = [](LambertPair const &in)
+  NextFun<LambertPair, IntType> next = [](LambertPair const& in)
   {
-    auto &&[lft, index] = in;
+    auto&& [lft, index] = in;
     auto x = 2 * index - 1;
-    return Rational{(lft.q * x + lft.r), (lft.s * x + lft.t)}
-        .floor();
+    return Rational{(lft.q * x + lft.r), (lft.s * x + lft.t)}.floor();
   };
 
-  SafeFun<LambertPair, IntType> safe
-      = [](LambertPair const &in, IntType const &n)
+  SafeFun<LambertPair, IntType> safe =
+    [](LambertPair const& in, IntType const& n)
   {
-    auto &&[lft, index] = in;
+    auto&& [lft, index] = in;
     auto x = 5 * index - 2;
-    return n
-           == Rational{(lft.q * x + 2 * lft.r),
-                       (lft.s * x + 2 * lft.t)}
-                  .floor();
+    return n ==
+           Rational{(lft.q * x + 2 * lft.r), (lft.s * x + 2 * lft.t)}.floor();
   };
-  ProdFun<LambertPair, IntType> prod
-      = [](LambertPair const &in, IntType const &n)
+  ProdFun<LambertPair, IntType> prod =
+    [](LambertPair const& in, IntType const& n)
   {
-    auto &&[z, i] = in;
+    auto&& [z, i] = in;
     return std::make_pair((LFT{10, -10 * n, 0, 1}).compose(z), i);
   };
-  ConsFun<LambertPair, LFT> cons
-      = [](LambertPair const &in, LFT const &z2)
+  ConsFun<LambertPair, LFT> cons = [](LambertPair const& in, LFT const& z2)
   {
-    auto &&[z, i] = in;
+    auto&& [z, i] = in;
     auto new_z = z.compose(z2);
     if (i % 1024 == 0)
     {
@@ -141,7 +144,8 @@ inline cppcoro::generator<IntType> pi_lambert()
   return stream(next, safe, prod, cons, init, std::move(lfts));
 }
 
-int main()
+int
+main()
 {
   auto count = 0;
   // std::cout.setf(
