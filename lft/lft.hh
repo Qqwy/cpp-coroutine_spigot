@@ -27,22 +27,22 @@ namespace Spigot
 
     inline Rational<Integral> operator()(Integral x) const
     {
-      return Rational{(q * x + r), (s * x + t)};
+      return {(q * x + r), (s * x + t)};
     }
 
     inline LFT normalize() const
     {
       auto common_factor = gcd(gcd(q, r), gcd(s, t));
-      return LFT{q / common_factor, r / common_factor,
-                 s / common_factor, t / common_factor};
+      return {q / common_factor, r / common_factor,
+              s / common_factor, t / common_factor};
     }
 
     inline LFT compose(LFT other) const
     {
       auto const &[u, v, w, x] = other;
 
-      return LFT{q * u + r * w, q * v + r * x, s * u + t * w,
-                 s * v + t * x};
+      return {q * u + r * w, q * v + r * x, s * u + t * w,
+              s * v + t * x};
     }
   };
 } // namespace Spigot

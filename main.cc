@@ -1,11 +1,11 @@
 #include "generator.hh"
+#include "lft/lft.hh"
+#include "rational/rational.hh"
+
 #include <boost/multiprecision/cpp_int.hpp>
 #include <cmath>
 #include <iostream>
 #include <numeric>
-
-#include "lft/lft.hh"
-#include "rational/rational.hh"
 
 using namespace boost::multiprecision;
 using IntType = cpp_int;
