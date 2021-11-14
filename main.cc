@@ -1,11 +1,13 @@
 #include "generator.hh"
 #include "lft/lft.hh"
 #include "rational/rational.hh"
+#include "spigot/spigot.hh"
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <cmath>
 #include <iostream>
 #include <numeric>
+#include <tuple>
 
 using namespace boost::multiprecision;
 using IntType = cpp_int;
@@ -52,18 +54,35 @@ stream(
   }
 }
 
-#include <cmath>
+struct PiLeibniz : public Spigot::Spigot<LFT, LFT, IntType> {
+  inline IntType next(LFT const &z) final override {
+    return z(3).floor();
+  };
 
-inline cppcoro::generator<IntType>
-positive_integers()
-{
-  IntType num = 1;
-  while (true)
-  {
-    co_yield num;
-    ++num;
+  inline bool safe(LFT const &z, IntType const &n) final override {
+    return n == z(4).floor();
   }
-}
+
+  inline LFT prod(LFT const &z, IntType const &n) final override {
+    return LFT{10, -10 * n, 0, 1}.compose(z);
+  }
+
+  inline LFT cons(LFT const &z, LFT const &z2) final override {
+    return z.compose(z2);
+  }
+
+  inline cppcoro::generator<LFT> elems() final override {
+    return cppcoro::fmap(
+      [](auto k) {
+        return LFT{k, 4 * k + 2, 0, 2 * k + 1};
+      },
+      ::Spigot::positive_integers<IntType>());
+  }
+
+  inline LFT initialState() override {
+    return LFT::unit();
+  }
+};
 
 inline cppcoro::generator<LFT>
 pi_leibniz_lfts()
@@ -72,7 +91,7 @@ pi_leibniz_lfts()
     [](auto k) {
       return LFT{k, 4 * k + 2, 0, 2 * k + 1};
     },
-    positive_integers());
+    Spigot::positive_integers<IntType>());
 }
 
 inline cppcoro::generator<IntType>
@@ -90,7 +109,6 @@ pi_leibniz()
   return stream(*next, *safe, *prod, *cons, init, std::move(lfts));
 }
 
-#include <tuple>
 
 inline cppcoro::generator<LFT>
 pi_lambert_lfts()
@@ -99,7 +117,7 @@ pi_lambert_lfts()
     [](auto i) {
       return LFT{2 * i - 1, i * i, 1, 0};
     },
-    positive_integers());
+    Spigot::positive_integers<IntType>());
 }
 
 using LambertPair = std::pair<LFT, IntType>;
@@ -148,18 +166,20 @@ int
 main()
 {
   auto count = 0;
-  // std::cout.setf(
-  //     std::ios::unitbuf); // so we see individual digits appear
+  std::cout.setf(
+      std::ios::unitbuf); // so we see individual digits appear
 
-  for (auto digit : pi_lambert())
-  {
-    // std::cout << digit;
-    printf("%d", (int)digit);
-
-    if (count > 10000)
+  // auto spigot = PiLeibniz{};
+  // for (auto digit : spigot.stream())
+  for (auto digit : pi_leibniz())
     {
-      break;
-    }
-    ++count;
+      std::cout << digit;
+      // printf("%d", (int)digit);
+
+      if (count > 10000)
+      {
+        break;
+      }
+      ++count;
   }
 }
