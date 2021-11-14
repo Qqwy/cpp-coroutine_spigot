@@ -5,42 +5,42 @@
 
 namespace Spigot
 {
-  template<typename Input, typename State, typename Result>
-  struct Spigot
-  {
-    virtual ~Spigot(){};
 
-    virtual inline Result next(State const&) = 0;
-    virtual inline bool safe(State const&, Result const&) = 0;
-    virtual inline State prod(State const&, Result const&) = 0;
-    virtual inline State cons(State const&, Input const&) = 0;
-    virtual inline cppcoro::generator<Input> elems() = 0;
-    virtual inline State initialState() = 0;
-
-    inline cppcoro::generator<Result> stream();
-  };
+  template<typename State, typename Result>
+  using NextFun = Result (*)(State const&);
+  template<typename State, typename Result>
+  using SafeFun = bool (*)(State const&, Result const&);
+  template<typename State, typename Result>
+  using ProdFun = State (*)(State const&, Result const&);
+  template<typename State, typename Input>
+  using ConsFun = State (*)(State const&, Input const&);
 
   template<typename Input, typename State, typename Result>
-  cppcoro::generator<Result> Spigot<Input, State, Result>::stream()
+  cppcoro::generator<Result> stream(
+    NextFun<State, Result> nextResult,
+    SafeFun<State, Result> safeToCommit,
+    ProdFun<State, Result> extractProducedResult,
+    ConsFun<State, Input> consumeInput,
+    State const& initialState,
+    cppcoro::generator<Input> input_stream)
   {
-    auto state = initialState();
-    auto gen = elems();
-    auto xs = gen.begin();
-    Input& x = *xs;
+    auto state = initialState;
+    auto input_stream_iterator = input_stream.begin();
+    Input& input = *input_stream_iterator;
 
     while (true)
     {
-      Result y = next(state);
-      if (safe(state, y))
+      Result result = nextResult(state);
+      if (safeToCommit(state, result))
       {
-        state = prod(state, y);
-        co_yield y;
+        state = extractProducedResult(state, result);
+        co_yield result;
       }
       else
       {
-        state = cons(state, x);
-        ++xs;
-        x = *xs;
+        state = consumeInput(state, input);
+        ++input_stream_iterator;
+        input = *input_stream_iterator;
       }
     }
   }

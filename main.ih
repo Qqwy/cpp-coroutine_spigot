@@ -1,0 +1,15 @@
+#include "generator.hh"
+#include "rational/rational.hh"
+#include "lft/lft.hh"
+#include "spigot/spigot.hh"
+#include <boost/multiprecision/cpp_int.hpp>
+
+using namespace boost::multiprecision;
+using IntType = cpp_int;
+
+using Rational = Spigot::Rational<IntType>;
+using LFT = Spigot::LFT<IntType>;
+
+cppcoro::generator<IntType> pi_leibniz();
+
+int main();
