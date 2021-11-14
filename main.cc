@@ -4,8 +4,8 @@
 #include <iostream>
 #include <numeric>
 
-#include "rational/rational.hh"
 #include "lft/lft.hh"
+#include "rational/rational.hh"
 
 using namespace boost::multiprecision;
 using IntType = cpp_int;
@@ -81,7 +81,7 @@ inline cppcoro::generator<IntType> pi_leibniz()
     return LFT{10, -10 * n, 0, 1}.compose(z);
   };
   auto cons
-    = [](LFT const &z, LFT const &z2) { return z.compose(z2); };
+      = [](LFT const &z, LFT const &z2) { return z.compose(z2); };
   return stream(*next, *safe, *prod, *cons, init, std::move(lfts));
 }
 
@@ -106,10 +106,8 @@ inline cppcoro::generator<IntType> pi_lambert()
   {
     auto &&[lft, index] = in;
     auto x = 2 * index - 1;
-    return Rational{
-      (lft.q * x + lft.r),
-      (lft.s * x + lft.t)
-    }.floor();
+    return Rational{(lft.q * x + lft.r), (lft.s * x + lft.t)}
+        .floor();
   };
 
   SafeFun<LambertPair, IntType> safe
@@ -118,17 +116,15 @@ inline cppcoro::generator<IntType> pi_lambert()
     auto &&[lft, index] = in;
     auto x = 5 * index - 2;
     return n
-           == Rational{
-      (lft.q * x + 2 * lft.r),
-      (lft.s * x + 2 * lft.t)
-    }.floor();
+           == Rational{(lft.q * x + 2 * lft.r),
+                       (lft.s * x + 2 * lft.t)}
+                  .floor();
   };
   ProdFun<LambertPair, IntType> prod
       = [](LambertPair const &in, IntType const &n)
   {
     auto &&[z, i] = in;
-    return std::make_pair((LFT{10, -10 * n, 0, 1}).compose(z),
-                          i);
+    return std::make_pair((LFT{10, -10 * n, 0, 1}).compose(z), i);
   };
   ConsFun<LambertPair, LFT> cons
       = [](LambertPair const &in, LFT const &z2)

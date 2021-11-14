@@ -3,7 +3,8 @@
 
 #include "../rational/rational.hh"
 
-namespace Spigot {
+namespace Spigot
+{
   /// A Linear Fractional Transformation
   /// also known as a Möbius Transformation
   ///
@@ -12,7 +13,7 @@ namespace Spigot {
   ///  | s  t |
   ///
   /// and as the function taking x -> (q * x + r ) / (s * x + t).
-  template<typename Integral>
+  template <typename Integral>
   struct LFT
   {
     // NOTE: We use SLVs here
@@ -24,32 +25,26 @@ namespace Spigot {
 
     static inline LFT unit() { return {1, 0, 0, 1}; }
 
-    inline Rational<Integral> operator()(Integral x) const {
+    inline Rational<Integral> operator()(Integral x) const
+    {
       return Rational{(q * x + r), (s * x + t)};
     }
 
-    inline LFT normalize() const {
+    inline LFT normalize() const
+    {
       auto common_factor = gcd(gcd(q, r), gcd(s, t));
-      return LFT{
-        q / common_factor,
-        r / common_factor,
-        s / common_factor,
-        t / common_factor
-      };
+      return LFT{q / common_factor, r / common_factor,
+                 s / common_factor, t / common_factor};
     }
 
     inline LFT compose(LFT other) const
     {
       auto const &[u, v, w, x] = other;
 
-      return LFT{
-        q * u + r * w,
-        q * v + r * x,
-        s * u + t * w,
-        s * v + t * x
-      };
+      return LFT{q * u + r * w, q * v + r * x, s * u + t * w,
+                 s * v + t * x};
     }
   };
-}
+} // namespace Spigot
 
 #endif

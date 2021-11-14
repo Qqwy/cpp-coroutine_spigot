@@ -18,6 +18,6 @@ namespace Spigot
       return Rational{in.num / res, in.denom.res};
     }
   };
-}
+} // namespace Spigot
 
 #endif
