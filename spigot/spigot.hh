@@ -3,15 +3,17 @@
 
 #include "../generator.hh"
 
-namespace Spigot {
+namespace Spigot
+{
   template<typename Input, typename State, typename Result>
-  struct Spigot {
+  struct Spigot
+  {
     virtual ~Spigot(){};
 
-    virtual inline Result next(State const &) = 0;
-    virtual inline bool safe(State const &, Result const &) = 0;
-    virtual inline State prod(State const &, Result const &) = 0;
-    virtual inline State cons(State const &, Input const &) = 0;
+    virtual inline Result next(State const&) = 0;
+    virtual inline bool safe(State const&, Result const&) = 0;
+    virtual inline State prod(State const&, Result const&) = 0;
+    virtual inline State cons(State const&, Input const&) = 0;
     virtual inline cppcoro::generator<Input> elems() = 0;
     virtual inline State initialState() = 0;
 
@@ -54,6 +56,5 @@ namespace Spigot {
     }
   }
 }
-
 
 #endif
