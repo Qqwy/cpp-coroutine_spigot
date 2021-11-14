@@ -7,5 +7,5 @@ BinPackParameters: 'false'
 BreakBeforeBraces: Allman
 ColumnLimit: '80'
 Cpp11BracedListStyle: 'true'
-
+NamespaceIndentation: All
 ...
