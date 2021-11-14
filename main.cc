@@ -7,7 +7,7 @@
 using namespace boost::multiprecision;
 using IntType = cpp_int;
 
-    struct Rational
+struct Rational
 {
   IntType num;
   IntType denom;
@@ -19,9 +19,7 @@ Rational normalize(Rational in)
   return {in.num / res, in.denom / res};
 }
 
-IntType floor(Rational in) {
-  return in.num / in.denom;
-  }
+IntType floor(Rational in) { return in.num / in.denom; }
 
 struct LFT
 {
@@ -33,7 +31,7 @@ struct LFT
 
 Rational extr(LFT lft, IntType x)
 {
-  return {(lft.q * x + lft.r) , (lft.s * x + lft.t)};
+  return {(lft.q * x + lft.r), (lft.s * x + lft.t)};
 }
 
 LFT unit() { return {1, 0, 0, 1}; }
@@ -61,11 +59,9 @@ LFT comp(LFT a, LFT b)
   // return normalize({q * u + r * w, q * v + r * x, s * u + t * w,
   //     s * v + t * x});
 
-  return {q * u + r * w, q * v + r * x, s * u + t * w, s * v + t * x};
+  return {q * u + r * w, q * v + r * x, s * u + t * w,
+          s * v + t * x};
 }
-
-
-
 
 template <typename State, typename Result>
 using NextFun = Result (*)(State const &);
@@ -77,26 +73,27 @@ template <typename State, typename Input>
 using ConsFun = State (*)(State const &, Input const &);
 
 template <typename Input, typename State, typename Result>
-cppcoro::generator<Result> stream(NextFun<State, Result> next, SafeFun<State, Result> safe,
-                             ProdFun<State, Result> prod, ConsFun<State, Input> cons,
-                             State z, cppcoro::generator<Input> xs)
+cppcoro::generator<Result>
+stream(NextFun<State, Result> next, SafeFun<State, Result> safe,
+       ProdFun<State, Result> prod, ConsFun<State, Input> cons,
+       State z, cppcoro::generator<Input> elems)
 {
-  auto it = xs.begin();
-  auto x = *it;
+  auto xs = elems.begin();
+  Input &x = *xs;
 
   while (true)
   {
-    auto y = next(z);
+    Result y = next(z);
     if (safe(z, y))
     {
-      co_yield y;
       z = prod(z, y);
+      co_yield y;
     }
     else
     {
       z = cons(z, x);
-      ++it;
-      x = *it;
+      ++xs;
+      x = *xs;
     }
   }
 }
@@ -128,12 +125,13 @@ cppcoro::generator<IntType> pi_leibniz()
   auto lfts = pi_leibniz_lfts();
 
   auto next = [](LFT const &z) { return floor(extr(z, 3)); };
-  auto safe
-      = [](LFT const &z, IntType const &n) { return n == floor(extr(z, 4)); };
+  auto safe = [](LFT const &z, IntType const &n)
+  { return n == floor(extr(z, 4)); };
   auto prod = [](LFT const &z, IntType const &n) {
     return comp({10, -10 * n, 0, 1}, z);
   };
-  auto cons = [](LFT const &z, LFT const &z2) { return comp(z, z2); };
+  auto cons
+      = [](LFT const &z, LFT const &z2) { return comp(z, z2); };
   return stream(*next, *safe, *prod, *cons, init, std::move(lfts));
 }
 
@@ -149,44 +147,53 @@ cppcoro::generator<LFT> pi_lambert_lfts()
 }
 
 using LambertPair = std::pair<LFT, IntType>;
-cppcoro::generator<IntType> pi_lambert() {
+cppcoro::generator<IntType> pi_lambert()
+{
   LambertPair init = {{0, 4, 1, 0}, 1};
   auto lfts = pi_lambert_lfts();
 
-  NextFun<LambertPair, IntType> next = [](LambertPair const &in){
-    auto && [lft, index] = in;
+  NextFun<LambertPair, IntType> next = [](LambertPair const &in)
+  {
+    auto &&[lft, index] = in;
     auto x = 2 * index - 1;
-    return floor(Rational{(lft.q * x + lft.r) , (lft.s * x + lft.t)});
+    return floor(Rational{(lft.q * x + lft.r), (lft.s * x + lft.t)});
   };
 
-  SafeFun<LambertPair, IntType> safe = [](LambertPair const &in, IntType const &n){
-    auto && [lft, index] = in;
+  SafeFun<LambertPair, IntType> safe
+      = [](LambertPair const &in, IntType const &n)
+  {
+    auto &&[lft, index] = in;
     auto x = 5 * index - 2;
-    return n == floor(Rational{(lft.q * x + 2 * lft.r) , (lft.s * x + 2 * lft.t)});
+    return n
+           == floor(Rational{(lft.q * x + 2 * lft.r),
+                             (lft.s * x + 2 * lft.t)});
   };
-  ProdFun<LambertPair, IntType> prod = [](LambertPair const &in, IntType const &n) {
-    auto && [z, i] = in;
+  ProdFun<LambertPair, IntType> prod
+      = [](LambertPair const &in, IntType const &n)
+  {
+    auto &&[z, i] = in;
     return std::make_pair(comp({10, -10 * n, 0, 1}, z), i);
   };
   ConsFun<LambertPair, LFT> cons
       = [](LambertPair const &in, LFT const &z2)
   {
-    auto && [z, i] = in;
+    auto &&[z, i] = in;
     auto new_z = comp(z, z2);
-    if (i % 1024 == 0) {
+    if (i % 1024 == 0)
+    {
       new_z = normalize(new_z);
     }
     return std::make_pair(new_z, IntType(i + 1));
   };
 
-  return stream(*next, *safe, *prod, *cons, init,
-                       std::move(lfts));
+  return stream(*next, *safe, *prod, *cons, init, std::move(lfts));
 }
 
 int main()
 {
   auto count = 0;
-  std::cout.setf(std::ios::unitbuf); // so we see individual digits appear
+  std::cout.setf(
+      std::ios::unitbuf); // so we see individual digits appear
 
   for (auto digit : pi_lambert())
   {
