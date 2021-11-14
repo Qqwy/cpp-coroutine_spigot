@@ -10,3 +10,5 @@ clean:
 	rm spigot_clang
 	rm spigot_gcc
 
+format:
+	find . -regex '.*\.\(cc\|hh\|impl\)' | xargs clang-format -i
