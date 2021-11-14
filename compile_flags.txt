@@ -1,0 +1,4 @@
+-c
+-std=c++20
+-stdlib=libc++
+-g
