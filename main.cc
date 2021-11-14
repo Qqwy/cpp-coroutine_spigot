@@ -30,7 +30,9 @@ pi_lambert()
   {
     auto&& [lft, index] = in;
     auto x = 2 * index - 1;
-    return Rational{(lft.q * x + lft.r), (lft.s * x + lft.t)}.floor();
+    return Rational{
+      (lft.q * x + lft.r), (lft.s * x + lft.t)}
+      .floor();
   };
 
   auto safe = [](LambertState const& in, IntType const& n)
@@ -38,12 +40,16 @@ pi_lambert()
     auto&& [lft, index] = in;
     auto x = 5 * index - 2;
     return n ==
-           Rational{(lft.q * x + 2 * lft.r), (lft.s * x + 2 * lft.t)}.floor();
+           Rational{
+             (lft.q * x + 2 * lft.r),
+             (lft.s * x + 2 * lft.t)}
+             .floor();
   };
   auto prod = [](LambertState const& in, IntType const& n)
   {
     auto&& [z, i] = in;
-    return std::make_pair((LFT{10, -10 * n, 0, 1}).compose(z), i);
+    return std::make_pair(
+      (LFT{10, -10 * n, 0, 1}).compose(z), i);
   };
   auto cons = [](LambertState const& in, LFT const& z2)
   {
@@ -56,14 +62,16 @@ pi_lambert()
     return std::make_pair(new_z, IntType(i + 1));
   };
 
-  return stream(*next, *safe, *prod, *cons, init, std::move(lfts));
+  return stream(
+    *next, *safe, *prod, *cons, init, std::move(lfts));
 }
 
 int
 main()
 {
   auto count = 0;
-  std::cout.setf(std::ios::unitbuf); // so we see individual digits appear
+  std::cout.setf(std::ios::unitbuf); // so we see individual
+                                     // digits appear
 
   for (auto digit : pi_leibniz())
   {

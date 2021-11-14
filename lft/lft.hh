@@ -12,7 +12,8 @@ namespace Spigot
   ///  | q  r |
   ///  | s  t |
   ///
-  /// and as the function taking x -> (q * x + r ) / (s * x + t).
+  /// and as the function taking x -> (q * x + r ) / (s * x
+  /// + t).
   template<typename Integral>
   struct LFT
   {
@@ -43,7 +44,11 @@ namespace Spigot
     inline LFT compose(LFT other) const
     {
       auto const& [u, v, w, x] = other;
-      return {q * u + r * w, q * v + r * x, s * u + t * w, s * v + t * x};
+      return {
+        q * u + r * w,
+        q * v + r * x,
+        s * u + t * w,
+        s * v + t * x};
     }
   };
 } // namespace Spigot

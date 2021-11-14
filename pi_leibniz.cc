@@ -1,11 +1,5 @@
 #include "main.ih"
 
-using namespace boost::multiprecision;
-using IntType = cpp_int;
-
-using Rational = Spigot::Rational<IntType>;
-using LFT = Spigot::LFT<IntType>;
-
 namespace
 {
   cppcoro::generator<LFT> inputStream()
@@ -17,19 +11,25 @@ namespace
       Spigot::positive_integers<IntType>());
   }
 
-  auto nextState(LFT const& z) -> decltype(auto) { return z(3).floor(); }
+  auto nextState(LFT const& z) -> decltype(auto)
+  {
+    return z(3).floor();
+  }
 
-  auto safeToCommit(LFT const& z, IntType const& n) -> decltype(auto)
+  auto safeToCommit(LFT const& z, IntType const& n)
+    -> decltype(auto)
   {
     return n == z(4).floor();
   }
 
-  auto extractProducedResult(LFT const& z, IntType const& n) -> decltype(auto)
+  auto extractProducedResult(LFT const& z, IntType const& n)
+    -> decltype(auto)
   {
     return LFT{10, -10 * n, 0, 1}.compose(z);
   };
 
-  auto consumeInput(LFT const& z, LFT const& z2) -> decltype(auto)
+  auto consumeInput(LFT const& z, LFT const& z2)
+    -> decltype(auto)
   {
     return z.compose(z2);
   }
