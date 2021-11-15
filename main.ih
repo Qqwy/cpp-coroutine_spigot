@@ -1,10 +1,15 @@
 #include "rational/rational.hh"
 #include "lft/lft.hh"
 #include "spigot/spigot.hh"
-#include <boost/multiprecision/cpp_int.hpp>
+// #include <boost/multiprecision/cpp_int.hpp>
 
-using namespace boost::multiprecision;
-using IntType = cpp_int;
+#include <bobcat/bigint>
+
+// using namespace boost::multiprecision;
+// using IntType = cpp_int;
+
+using namespace FBB;
+using IntType = ::FBB::BigInt;
 
 using Rational = Spigot::Rational<IntType>;
 using LFT = Spigot::LFT<IntType>;

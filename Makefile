@@ -1,4 +1,4 @@
-COMMON_FLAGS = -std=c++20 -Wall -Werror -O3 -g -s -flto *.cc
+COMMON_FLAGS = -std=c++20 -Wall -Werror -O3 -g -s -flto *.cc -lbobcat -lcrypto
 
 
 all: gcc clang

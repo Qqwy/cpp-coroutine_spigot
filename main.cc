@@ -13,7 +13,7 @@ int main()
 
   for (auto digit : pi_lambert())
   {
-    std::cout << digit;
+    std::cout << digit.ulong();
     // printf("%d", (int)digit);
 
     if (count > 10000)
