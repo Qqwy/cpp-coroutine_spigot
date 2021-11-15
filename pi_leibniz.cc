@@ -5,31 +5,31 @@ namespace
   Spigot::Generator<LFT> inputStream()
   {
     auto ints = Spigot::positive_integers<IntType>();
-    for (auto num : ints)
+    for (auto const &num : ints)
     {
       co_yield LFT{num, 4 * num + 2, 0, 2 * num + 1};
     }
   }
 
-  auto nextState(LFT const &z) -> decltype(auto)
+  auto nextState(LFT const &lft) -> decltype(auto)
   {
-    return z(3).floor();
+    return lft(3).floor();
   }
 
-  auto safeToCommit(LFT const &z, IntType const &n) -> decltype(auto)
+  auto safeToCommit(LFT const &lft, IntType const &digit) -> decltype(auto)
   {
-    return n == z(4).floor();
+    return digit == lft(4).floor();
   }
 
-  auto extractProducedResult(LFT const &z, IntType const &n)
+  auto extractProducedResult(LFT const &lft, IntType const &digit)
     -> decltype(auto)
   {
-    return LFT{10, -10 * n, 0, 1}.compose(z);
+    return LFT{10, -10 * digit, 0, 1}.compose(lft);
   };
 
-  auto consumeInput(LFT const &z, LFT const &z2) -> decltype(auto)
+  auto consumeInput(LFT const &lft, LFT const &input) -> decltype(auto)
   {
-    return z.compose(z2);
+    return lft.compose(input);
   }
 }
 

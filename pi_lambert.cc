@@ -18,26 +18,28 @@ namespace
 
   IntType nextResult(LambertState const &state)
   {
+    // NOTE: SLVs used which correspond to the paper
     auto const &[lft, index] = state;
     auto const &[q, r, s, t] = lft;
     auto x = 2 * index - 1;
     return Rational{q * x + r, s * x + t}.floor();
   }
 
-  bool safeToCommit(LambertState const &in, IntType const &n)
+  bool safeToCommit(LambertState const &state, IntType const &digit)
   {
-    auto const &[lft, index] = in;
+    // NOTE: SLVs used which correspond to the paper
+    auto const &[lft, index] = state;
     auto const &[q, r, s, t] = lft;
     auto x = 5 * index - 2;
-    return n == Rational{q * x + 2 * r, s * x + 2 * t}.floor();
+    return digit == Rational{q * x + 2 * r, s * x + 2 * t}.floor();
   };
 
   LambertState extractProducedResult(
-    LambertState const &in,
-    IntType const &n)
+    LambertState const &state,
+    IntType const &digit)
   {
-    auto const &[lft, index] = in;
-    auto new_lft = LFT{10, -10 * n, 0, 1}.compose(lft);
+    auto const &[lft, index] = state;
+    auto new_lft = LFT{10, -10 * digit, 0, 1}.compose(lft);
     return {new_lft, index};
   }
 
