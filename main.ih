@@ -1,4 +1,3 @@
-#include "generator.hh"
 #include "rational/rational.hh"
 #include "lft/lft.hh"
 #include "spigot/spigot.hh"
@@ -10,8 +9,8 @@ using IntType = cpp_int;
 using Rational = Spigot::Rational<IntType>;
 using LFT = Spigot::LFT<IntType>;
 
-cppcoro::generator<IntType> pi_leibniz();
-cppcoro::generator<IntType> pi_lambert();
-cppcoro::generator<IntType> pi_gosper();
+Spigot::Generator<IntType> pi_leibniz();
+Spigot::Generator<IntType> pi_lambert();
+Spigot::Generator<IntType> pi_gosper();
 
 int main();

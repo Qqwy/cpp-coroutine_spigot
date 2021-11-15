@@ -5,7 +5,7 @@ AlignTrailingComments: 'true'
 BinPackArguments: 'false'
 BinPackParameters: 'false'
 BreakBeforeBraces: Allman
-ColumnLimit: '60'
+ColumnLimit: '70'
 Cpp11BracedListStyle: 'true'
 NamespaceIndentation: All
 ...
