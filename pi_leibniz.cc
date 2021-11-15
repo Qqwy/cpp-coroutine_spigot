@@ -33,8 +33,7 @@ namespace
   }
 }
 
-Spigot::Generator<IntType>
-pi_leibniz()
+Spigot::Generator<IntType> pi_leibniz()
 {
   return Spigot::stream(
     nextState,

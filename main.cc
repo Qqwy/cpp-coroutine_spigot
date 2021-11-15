@@ -5,8 +5,7 @@
 #include <numeric>
 #include <tuple>
 
-int
-main()
+int main()
 {
   auto count = 0;
   std::cout.setf(std::ios::unitbuf); // so we see individual

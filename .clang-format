@@ -9,4 +9,6 @@ ColumnLimit: '70'
 Cpp11BracedListStyle: 'true'
 NamespaceIndentation: All
 PointerAlignment: Right
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
 ...

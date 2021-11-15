@@ -55,8 +55,7 @@ namespace
   }
 }
 
-Spigot::Generator<IntType>
-pi_lambert()
+Spigot::Generator<IntType> pi_lambert()
 {
   return stream(
     nextResult,
