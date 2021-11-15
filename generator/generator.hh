@@ -44,19 +44,22 @@ namespace cppcoro
 
       generator<T> get_return_object() noexcept;
 
-      constexpr std::suspend_always initial_suspend() const noexcept
+      constexpr std::suspend_always initial_suspend()
+        const noexcept
       {
         return {};
       }
-      constexpr std::suspend_always final_suspend() const noexcept
+      constexpr std::suspend_always final_suspend()
+        const noexcept
       {
         return {};
       }
 
       template<
         typename U = T,
-        std::enable_if_t<!std::is_rvalue_reference<U>::value, int> =
-          0>
+        std::enable_if_t<
+          !std::is_rvalue_reference<U>::value,
+          int> = 0>
       std::suspend_always yield_value(
         std::remove_reference_t<T> &value) noexcept
       {
@@ -116,9 +119,12 @@ namespace cppcoro
       // What type should we use for counting elements of a
       // potentially infinite sequence?
       using difference_type = std::ptrdiff_t;
-      using value_type = typename generator_promise<T>::value_type;
-      using reference = typename generator_promise<T>::reference_type;
-      using pointer = typename generator_promise<T>::pointer_type;
+      using value_type =
+        typename generator_promise<T>::value_type;
+      using reference =
+        typename generator_promise<T>::reference_type;
+      using pointer =
+        typename generator_promise<T>::pointer_type;
 
       // Iterator needs to be default-constructible to
       // satisfy the Range concept.
@@ -127,7 +133,8 @@ namespace cppcoro
       {
       }
 
-      explicit generator_iterator(coroutine_handle coroutine) noexcept
+      explicit generator_iterator(
+        coroutine_handle coroutine) noexcept
         : m_coroutine(coroutine)
       {
       }
@@ -269,7 +276,8 @@ namespace cppcoro
   namespace detail
   {
     template<typename T>
-    generator<T> generator_promise<T>::get_return_object() noexcept
+    generator<T>
+    generator_promise<T>::get_return_object() noexcept
     {
       using coroutine_handle =
         std::coroutine_handle<generator_promise<T>>;
@@ -285,7 +293,8 @@ namespace cppcoro
   {
     for (auto &&value : source)
     {
-      co_yield std::invoke(func, static_cast<decltype(value)>(value));
+      co_yield std::invoke(
+        func, static_cast<decltype(value)>(value));
     }
   }
 } // namespace cppcoro
@@ -329,7 +338,10 @@ namespace cppcoro
         return recursive_generator<T>{*this};
       }
 
-      std::suspend_always initial_suspend() noexcept { return {}; }
+      std::suspend_always initial_suspend() noexcept
+      {
+        return {};
+      }
 
       std::suspend_always final_suspend() noexcept { return {}; }
 
@@ -490,9 +502,10 @@ namespace cppcoro
       other.m_promise = nullptr;
     }
 
-    recursive_generator(const recursive_generator &other) = delete;
-    recursive_generator &operator=(const recursive_generator &other) =
+    recursive_generator(const recursive_generator &other) =
       delete;
+    recursive_generator &operator=(
+      const recursive_generator &other) = delete;
 
     ~recursive_generator()
     {
@@ -633,7 +646,8 @@ namespace cppcoro
   {
     for (auto &&value : source)
     {
-      co_yield std::invoke(func, static_cast<decltype(value)>(value));
+      co_yield std::invoke(
+        func, static_cast<decltype(value)>(value));
     }
   }
 } // namespace cppcoro

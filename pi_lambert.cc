@@ -25,13 +25,16 @@ namespace
     return Rational{q * x + r, s * x + t}.floor();
   }
 
-  bool safeToCommit(LambertState const &state, IntType const &digit)
+  bool safeToCommit(
+    LambertState const &state,
+    IntType const &digit)
   {
     // NOTE: SLVs used which correspond to the paper
     auto const &[lft, index] = state;
     auto const &[q, r, s, t] = lft;
     auto x = 5 * index - 2;
-    return digit == Rational{q * x + 2 * r, s * x + 2 * t}.floor();
+    return digit ==
+           Rational{q * x + 2 * r, s * x + 2 * t}.floor();
   };
 
   LambertState extractProducedResult(

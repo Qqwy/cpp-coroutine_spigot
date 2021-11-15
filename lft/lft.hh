@@ -12,13 +12,13 @@ namespace Spigot
   ///  | q  r |
   ///  | s  t |
   ///
-  /// and as the function taking x -> (q * x + r ) / (s * x
-  /// + t).
+  /// and as the function
+  /// which takes x -> (q * x + r ) / (s * x + t).
   template<typename Integral>
   struct LFT
   {
     // NOTE: We use SLVs here
-    // because all literature uses these names
+    // because the math literature uses these names
     Integral q;
     Integral r;
     Integral s;
@@ -26,7 +26,7 @@ namespace Spigot
 
     static inline LFT unit() { return {1, 0, 0, 1}; }
 
-    inline Rational<Integral> operator()(Integral x) const
+    inline Rational<Integral> operator()(Integral const &x) const
     {
       return {(q * x + r), (s * x + t)};
     }
@@ -43,9 +43,13 @@ namespace Spigot
 
     inline LFT compose(LFT other) const
     {
+      // NOTE: SLVs used which correspond to the paper
       auto const &[u, v, w, x] = other;
       return {
-        q * u + r * w, q * v + r * x, s * u + t * w, s * v + t * x};
+        q * u + r * w,
+        q * v + r * x,
+        s * u + t * w,
+        s * v + t * x};
     }
   };
 } // namespace Spigot

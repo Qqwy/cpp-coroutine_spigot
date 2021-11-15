@@ -11,23 +11,19 @@ namespace
     }
   }
 
-  auto nextState(LFT const &lft) -> decltype(auto)
-  {
-    return lft(3).floor();
-  }
+  IntType nextResult(LFT const &lft) { return lft(3).floor(); }
 
-  auto safeToCommit(LFT const &lft, IntType const &digit) -> decltype(auto)
+  bool safeToCommit(LFT const &lft, IntType const &digit)
   {
     return digit == lft(4).floor();
   }
 
-  auto extractProducedResult(LFT const &lft, IntType const &digit)
-    -> decltype(auto)
+  LFT extractProducedResult(LFT const &lft, IntType const &digit)
   {
     return LFT{10, -10 * digit, 0, 1}.compose(lft);
   };
 
-  auto consumeInput(LFT const &lft, LFT const &input) -> decltype(auto)
+  LFT consumeInput(LFT const &lft, LFT const &input)
   {
     return lft.compose(input);
   }
@@ -36,7 +32,7 @@ namespace
 Spigot::Generator<IntType> pi_leibniz()
 {
   return Spigot::stream(
-    nextState,
+    nextResult,
     safeToCommit,
     extractProducedResult,
     consumeInput,
