@@ -12,7 +12,7 @@ main()
   std::cout.setf(std::ios::unitbuf); // so we see individual
                                      // digits appear
 
-  for (auto digit : pi_gosper())
+  for (auto digit : pi_lambert())
   {
     std::cout << digit;
     // printf("%d", (int)digit);
