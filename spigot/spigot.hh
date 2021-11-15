@@ -13,10 +13,13 @@ namespace Spigot
 
   template<typename State, typename Result>
   using NextFun = Result (*)(State const &);
+
   template<typename State, typename Result>
   using SafeFun = bool (*)(State const &, Result const &);
+
   template<typename State, typename Result>
   using ProdFun = State (*)(State const &, Result const &);
+
   template<typename State, typename Input>
   using ConsFun = State (*)(State const &, Input const &);
 
