@@ -24,7 +24,7 @@ namespace
     auto const& [q, r, s, t] = lft;
     auto x = 27 * index + 15;
 
-    return (q * x + 5 * r) / (s * x + 125 * t);
+    return (q * x + 5 * r) / (s * x + 5 * t);
   }
 
   bool safeToCommit(
