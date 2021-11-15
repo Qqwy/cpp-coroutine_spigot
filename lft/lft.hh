@@ -43,8 +43,9 @@ namespace Spigot
 
     inline LFT compose(LFT other) const
     {
-      auto const& [u, v, w, x] = other;
-      return {q * u + r * w, q * v + r * x, s * u + t * w, s * v + t * x};
+      auto const &[u, v, w, x] = other;
+      return {
+        q * u + r * w, q * v + r * x, s * u + t * w, s * v + t * x};
     }
   };
 } // namespace Spigot

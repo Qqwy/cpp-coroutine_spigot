@@ -12,13 +12,13 @@ namespace Spigot
   using Generator = cppcoro::generator<Value>;
 
   template<typename State, typename Result>
-  using NextFun = Result (*)(State const&);
+  using NextFun = Result (*)(State const &);
   template<typename State, typename Result>
-  using SafeFun = bool (*)(State const&, Result const&);
+  using SafeFun = bool (*)(State const &, Result const &);
   template<typename State, typename Result>
-  using ProdFun = State (*)(State const&, Result const&);
+  using ProdFun = State (*)(State const &, Result const &);
   template<typename State, typename Input>
-  using ConsFun = State (*)(State const&, Input const&);
+  using ConsFun = State (*)(State const &, Input const &);
 
   template<typename Input, typename State, typename Result>
   Generator<Result> stream(
@@ -30,7 +30,7 @@ namespace Spigot
     Generator<Input> input_stream)
   {
     auto input_stream_iterator = input_stream.begin();
-    Input& input = *input_stream_iterator;
+    Input &input = *input_stream_iterator;
 
     while (true)
     {

@@ -36,8 +36,9 @@ namespace cppcoro
     {
     public:
       using value_type = std::remove_reference_t<T>;
-      using reference_type = std::conditional_t<std::is_reference_v<T>, T, T&>;
-      using pointer_type = value_type*;
+      using reference_type =
+        std::conditional_t<std::is_reference_v<T>, T, T &>;
+      using pointer_type = value_type *;
 
       generator_promise() = default;
 
@@ -54,22 +55,26 @@ namespace cppcoro
 
       template<
         typename U = T,
-        std::enable_if_t<!std::is_rvalue_reference<U>::value, int> = 0>
+        std::enable_if_t<!std::is_rvalue_reference<U>::value, int> =
+          0>
       std::suspend_always yield_value(
-        std::remove_reference_t<T>& value) noexcept
+        std::remove_reference_t<T> &value) noexcept
       {
         m_value = std::addressof(value);
         return {};
       }
 
       std::suspend_always yield_value(
-        std::remove_reference_t<T>&& value) noexcept
+        std::remove_reference_t<T> &&value) noexcept
       {
         m_value = std::addressof(value);
         return {};
       }
 
-      void unhandled_exception() { m_exception = std::current_exception(); }
+      void unhandled_exception()
+      {
+        m_exception = std::current_exception();
+      }
 
       void return_void() {}
 
@@ -81,7 +86,7 @@ namespace cppcoro
       // Don't allow any use of 'co_await' inside the
       // generator coroutine.
       template<typename U>
-      std::suspend_never await_transform(U&& value) = delete;
+      std::suspend_never await_transform(U &&value) = delete;
 
       void rethrow_if_exception()
       {
@@ -103,7 +108,8 @@ namespace cppcoro
     template<typename T>
     class generator_iterator
     {
-      using coroutine_handle = std::coroutine_handle<generator_promise<T>>;
+      using coroutine_handle =
+        std::coroutine_handle<generator_promise<T>>;
 
     public:
       using iterator_category = std::input_iterator_tag;
@@ -127,14 +133,14 @@ namespace cppcoro
       }
 
       friend bool operator==(
-        const generator_iterator& it,
+        const generator_iterator &it,
         generator_sentinel) noexcept
       {
         return !it.m_coroutine || it.m_coroutine.done();
       }
 
       friend bool operator!=(
-        const generator_iterator& it,
+        const generator_iterator &it,
         generator_sentinel s) noexcept
       {
         return !(it == s);
@@ -142,19 +148,19 @@ namespace cppcoro
 
       friend bool operator==(
         generator_sentinel s,
-        const generator_iterator& it) noexcept
+        const generator_iterator &it) noexcept
       {
         return (it == s);
       }
 
       friend bool operator!=(
         generator_sentinel s,
-        const generator_iterator& it) noexcept
+        const generator_iterator &it) noexcept
       {
         return it != s;
       }
 
-      generator_iterator& operator++()
+      generator_iterator &operator++()
       {
         m_coroutine.resume();
         if (m_coroutine.done())
@@ -196,13 +202,13 @@ namespace cppcoro
     {
     }
 
-    generator(generator&& other) noexcept
+    generator(generator &&other) noexcept
       : m_coroutine(other.m_coroutine)
     {
       other.m_coroutine = nullptr;
     }
 
-    generator(const generator& other) = delete;
+    generator(const generator &other) = delete;
 
     ~generator()
     {
@@ -212,7 +218,7 @@ namespace cppcoro
       }
     }
 
-    generator& operator=(generator other) noexcept
+    generator &operator=(generator other) noexcept
     {
       swap(other);
       return *this;
@@ -237,7 +243,7 @@ namespace cppcoro
       return detail::generator_sentinel{};
     }
 
-    void swap(generator& other) noexcept
+    void swap(generator &other) noexcept
     {
       std::swap(m_coroutine, other.m_coroutine);
     }
@@ -245,7 +251,8 @@ namespace cppcoro
   private:
     friend class detail::generator_promise<T>;
 
-    explicit generator(std::coroutine_handle<promise_type> coroutine) noexcept
+    explicit generator(
+      std::coroutine_handle<promise_type> coroutine) noexcept
       : m_coroutine(coroutine)
     {
     }
@@ -254,7 +261,7 @@ namespace cppcoro
   };
 
   template<typename T>
-  void swap(generator<T>& a, generator<T>& b)
+  void swap(generator<T> &a, generator<T> &b)
   {
     a.swap(b);
   }
@@ -264,17 +271,19 @@ namespace cppcoro
     template<typename T>
     generator<T> generator_promise<T>::get_return_object() noexcept
     {
-      using coroutine_handle = std::coroutine_handle<generator_promise<T>>;
+      using coroutine_handle =
+        std::coroutine_handle<generator_promise<T>>;
       return generator<T>{coroutine_handle::from_promise(*this)};
     }
   } // namespace detail
 
   template<typename FUNC, typename T>
-  generator<
-    std::invoke_result_t<FUNC&, typename generator<T>::iterator::reference>>
+  generator<std::invoke_result_t<
+    FUNC &,
+    typename generator<T>::iterator::reference>>
   fmap(FUNC func, generator<T> source)
   {
-    for (auto&& value : source)
+    for (auto &&value : source)
     {
       co_yield std::invoke(func, static_cast<decltype(value)>(value));
     }
@@ -312,8 +321,8 @@ namespace cppcoro
       {
       }
 
-      promise_type(const promise_type&) = delete;
-      promise_type(promise_type&&) = delete;
+      promise_type(const promise_type &) = delete;
+      promise_type(promise_type &&) = delete;
 
       auto get_return_object() noexcept
       {
@@ -331,29 +340,29 @@ namespace cppcoro
 
       void return_void() noexcept {}
 
-      std::suspend_always yield_value(T& value) noexcept
+      std::suspend_always yield_value(T &value) noexcept
       {
         m_value = std::addressof(value);
         return {};
       }
 
-      std::suspend_always yield_value(T&& value) noexcept
+      std::suspend_always yield_value(T &&value) noexcept
       {
         m_value = std::addressof(value);
         return {};
       }
 
-      auto yield_value(recursive_generator&& generator) noexcept
+      auto yield_value(recursive_generator &&generator) noexcept
       {
         return yield_value(generator);
       }
 
-      auto yield_value(recursive_generator& generator) noexcept
+      auto yield_value(recursive_generator &generator) noexcept
       {
         struct awaitable
         {
 
-          awaitable(promise_type* childPromise)
+          awaitable(promise_type *childPromise)
             : m_childPromise(childPromise)
           {
           }
@@ -363,7 +372,10 @@ namespace cppcoro
             return this->m_childPromise == nullptr;
           }
 
-          void await_suspend(std::coroutine_handle<promise_type>) noexcept {}
+          void await_suspend(
+            std::coroutine_handle<promise_type>) noexcept
+          {
+          }
 
           void await_resume()
           {
@@ -374,7 +386,7 @@ namespace cppcoro
           }
 
         private:
-          promise_type* m_childPromise;
+          promise_type *m_childPromise;
         };
 
         if (generator.m_promise != nullptr)
@@ -398,11 +410,12 @@ namespace cppcoro
       // Don't allow any use of 'co_await' inside the
       // recursive_generator coroutine.
       template<typename U>
-      std::suspend_never await_transform(U&& value) = delete;
+      std::suspend_never await_transform(U &&value) = delete;
 
       void destroy() noexcept
       {
-        std::coroutine_handle<promise_type>::from_promise(*this).destroy();
+        std::coroutine_handle<promise_type>::from_promise(*this)
+          .destroy();
       }
 
       void throw_if_exception()
@@ -415,10 +428,12 @@ namespace cppcoro
 
       bool is_complete() noexcept
       {
-        return std::coroutine_handle<promise_type>::from_promise(*this).done();
+        return std::coroutine_handle<promise_type>::from_promise(
+                 *this)
+          .done();
       }
 
-      T& value() noexcept
+      T &value() noexcept
       {
         assert(this == m_root);
         assert(!is_complete());
@@ -432,7 +447,8 @@ namespace cppcoro
 
         m_parentOrLeaf->resume();
 
-        while (m_parentOrLeaf != this && m_parentOrLeaf->is_complete())
+        while (m_parentOrLeaf != this &&
+               m_parentOrLeaf->is_complete())
         {
           m_parentOrLeaf = m_parentOrLeaf->m_parentOrLeaf;
           m_parentOrLeaf->resume();
@@ -442,19 +458,20 @@ namespace cppcoro
     private:
       void resume() noexcept
       {
-        std::coroutine_handle<promise_type>::from_promise(*this).resume();
+        std::coroutine_handle<promise_type>::from_promise(*this)
+          .resume();
       }
 
       std::add_pointer_t<T> m_value;
       std::exception_ptr m_exception;
 
-      promise_type* m_root;
+      promise_type *m_root;
 
       // If this is the promise of the root generator then
       // this field is a pointer to the leaf promise. For
       // non-root generators this is a pointer to the parent
       // promise.
-      promise_type* m_parentOrLeaf;
+      promise_type *m_parentOrLeaf;
     };
 
     recursive_generator() noexcept
@@ -462,19 +479,20 @@ namespace cppcoro
     {
     }
 
-    recursive_generator(promise_type& promise) noexcept
+    recursive_generator(promise_type &promise) noexcept
       : m_promise(&promise)
     {
     }
 
-    recursive_generator(recursive_generator&& other) noexcept
+    recursive_generator(recursive_generator &&other) noexcept
       : m_promise(other.m_promise)
     {
       other.m_promise = nullptr;
     }
 
-    recursive_generator(const recursive_generator& other) = delete;
-    recursive_generator& operator=(const recursive_generator& other) = delete;
+    recursive_generator(const recursive_generator &other) = delete;
+    recursive_generator &operator=(const recursive_generator &other) =
+      delete;
 
     ~recursive_generator()
     {
@@ -484,7 +502,8 @@ namespace cppcoro
       }
     }
 
-    recursive_generator& operator=(recursive_generator&& other) noexcept
+    recursive_generator &operator=(
+      recursive_generator &&other) noexcept
     {
       if (this != &other)
       {
@@ -508,7 +527,8 @@ namespace cppcoro
       // potentially infinite sequence?
       using difference_type = std::ptrdiff_t;
       using value_type = std::remove_reference_t<T>;
-      using reference = std::conditional_t<std::is_reference_v<T>, T, T&>;
+      using reference =
+        std::conditional_t<std::is_reference_v<T>, T, T &>;
       using pointer = std::add_pointer_t<T>;
 
       iterator() noexcept
@@ -516,22 +536,22 @@ namespace cppcoro
       {
       }
 
-      explicit iterator(promise_type* promise) noexcept
+      explicit iterator(promise_type *promise) noexcept
         : m_promise(promise)
       {
       }
 
-      bool operator==(const iterator& other) const noexcept
+      bool operator==(const iterator &other) const noexcept
       {
         return m_promise == other.m_promise;
       }
 
-      bool operator!=(const iterator& other) const noexcept
+      bool operator!=(const iterator &other) const noexcept
       {
         return m_promise != other.m_promise;
       }
 
-      iterator& operator++()
+      iterator &operator++()
       {
         assert(m_promise != nullptr);
         assert(!m_promise->is_complete());
@@ -539,7 +559,7 @@ namespace cppcoro
         m_promise->pull();
         if (m_promise->is_complete())
         {
-          auto* temp = m_promise;
+          auto *temp = m_promise;
           m_promise = nullptr;
           temp->throw_if_exception();
         }
@@ -561,7 +581,7 @@ namespace cppcoro
       }
 
     private:
-      promise_type* m_promise;
+      promise_type *m_promise;
     };
 
     iterator begin()
@@ -582,7 +602,7 @@ namespace cppcoro
 
     iterator end() noexcept { return iterator(nullptr); }
 
-    void swap(recursive_generator& other) noexcept
+    void swap(recursive_generator &other) noexcept
     {
       std::swap(m_promise, other.m_promise);
     }
@@ -590,11 +610,13 @@ namespace cppcoro
   private:
     friend class promise_type;
 
-    promise_type* m_promise;
+    promise_type *m_promise;
   };
 
   template<typename T>
-  void swap(recursive_generator<T>& a, recursive_generator<T>& b) noexcept
+  void swap(
+    recursive_generator<T> &a,
+    recursive_generator<T> &b) noexcept
   {
     a.swap(b);
   }
@@ -605,11 +627,11 @@ namespace cppcoro
   // in a recursive context.
   template<typename FUNC, typename T>
   generator<std::invoke_result_t<
-    FUNC&,
+    FUNC &,
     typename recursive_generator<T>::iterator::reference>>
   fmap(FUNC func, recursive_generator<T> source)
   {
-    for (auto&& value : source)
+    for (auto &&value : source)
     {
       co_yield std::invoke(func, static_cast<decltype(value)>(value));
     }
