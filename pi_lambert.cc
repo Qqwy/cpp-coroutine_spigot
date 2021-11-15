@@ -5,15 +5,14 @@ namespace
 {
   using LambertState = std::pair<LFT, IntType>;
 
-  LambertState initialState() { return std::make_pair<LFT, IntType>({0, 4, 1, 0}, 1); }
+  LambertState initialState() { return {{0, 4, 1, 0}, 1}; }
 
   cppcoro::generator<LFT> inputStream()
   {
-    return cppcoro::fmap(
-      [](auto num) {
-        return LFT{2 * num - 1, num * num, 1, 0};
-      },
-      Spigot::positive_integers<IntType>());
+    auto ints = Spigot::positive_integers<IntType>();
+    for(auto num : ints) {
+      co_yield LFT{2 * num - 1, num * num, 1, 0};
+    }
   }
 
   IntType nextResult(LambertState const& in)
@@ -52,22 +51,23 @@ namespace
   {
     auto&& [trans, index] = state;
     auto new_trans = trans.compose(input);
-    if (index % 1024 == 0)
-    {
-      new_trans = new_trans.normalize();
-    }
-    return std::make_pair(new_trans, IntType(index + 1));
+    // if (index % 1024 == 0)
+    // {
+    //   new_trans = new_trans.normalize();
+    // }
+    return {new_trans, index + 1};
   }
 }
 
 cppcoro::generator<IntType>
 pi_lambert()
 {
+  auto init = initialState();
   return stream(
     nextResult,
     safeToCommit,
     extractProducedResult,
     consumeInput,
-    initialState(),
+    init,
     inputStream());
 }

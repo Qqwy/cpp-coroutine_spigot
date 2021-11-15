@@ -4,11 +4,10 @@ namespace
 {
   cppcoro::generator<LFT> inputStream()
   {
-    return cppcoro::fmap(
-      [](auto k) {
-        return LFT{k, 4 * k + 2, 0, 2 * k + 1};
-      },
-      Spigot::positive_integers<IntType>());
+    auto ints = Spigot::positive_integers<IntType>();
+    for(auto num : ints) {
+      co_yield LFT{num, 4 * num + 2, 0, 2 * num + 1};
+    }
   }
 
   auto nextState(LFT const& z) -> decltype(auto)

@@ -21,10 +21,9 @@ namespace Spigot
     SafeFun<State, Result> safeToCommit,
     ProdFun<State, Result> extractProducedResult,
     ConsFun<State, Input> consumeInput,
-    State const& initialState,
+    State state,
     cppcoro::generator<Input> input_stream)
   {
-    State state = initialState;
     auto input_stream_iterator = input_stream.begin();
     Input& input = *input_stream_iterator;
 
