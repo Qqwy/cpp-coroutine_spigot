@@ -1,11 +1,13 @@
+COMMON_FLAGS = -std=c++20 -Wall -Werror -O3 -g -s -flto *.cc
+
+
 all: gcc clang
 
 clang:
-	 clang++ -std=c++20 -o spigot_clang -Wall -Werror -stdlib=libc++ -O3 -g -flto *.cc
+	 clang++ -o spigot_clang -stdlib=libc++ $(COMMON_FLAGS)
 
 gcc:
-	g++ -std=c++20 -o spigot_gcc -Wall -Werror -O3 -g -flto *.cc
-
+	g++ -o spigot_gcc  $(COMMON_FLAGS)
 clean:
 	rm spigot_clang
 	rm spigot_gcc
