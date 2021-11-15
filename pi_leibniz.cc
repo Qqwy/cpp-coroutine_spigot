@@ -33,7 +33,6 @@ namespace
   {
     return z.compose(z2);
   }
-
 }
 
 cppcoro::generator<IntType>

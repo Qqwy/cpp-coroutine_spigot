@@ -24,7 +24,7 @@ namespace Spigot
     State const& initialState,
     cppcoro::generator<Input> input_stream)
   {
-    auto state = initialState;
+    State state = initialState;
     auto input_stream_iterator = input_stream.begin();
     Input& input = *input_stream_iterator;
 

@@ -11,5 +11,6 @@ using Rational = Spigot::Rational<IntType>;
 using LFT = Spigot::LFT<IntType>;
 
 cppcoro::generator<IntType> pi_leibniz();
+cppcoro::generator<IntType> pi_lambert();
 
 int main();
