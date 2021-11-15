@@ -5,7 +5,8 @@ namespace
   cppcoro::generator<LFT> inputStream()
   {
     auto ints = Spigot::positive_integers<IntType>();
-    for(auto num : ints) {
+    for (auto num : ints)
+    {
       co_yield LFT{num, 4 * num + 2, 0, 2 * num + 1};
     }
   }

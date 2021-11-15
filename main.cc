@@ -17,7 +17,7 @@ main()
     std::cout << digit;
     // printf("%d", (int)digit);
 
-    if (count > 100000)
+    if (count > 10000)
     {
       break;
     }
